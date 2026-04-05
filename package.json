@@ -1,8 +1,20 @@
 {
-  "name": "react-example",
-  "private": true,
-  "version": "0.0.0",
+ "name": "@shanid77shan-ops/remix-ai-inv-v9",
+  "version": "1.1.0",
+  "homepage": "https://github.com/shanid77shan-ops/Remix-Ai-Inv-v9#readme",
+  "description": "A React and Vite project published to GitHub Packages",
   "type": "module",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shanid77shan-ops/Remix-Ai-Inv-v9.git"
+  },
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
@@ -32,7 +44,6 @@
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "typescript": "~5.8.2"
   }
 }
