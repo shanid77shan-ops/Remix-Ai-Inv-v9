@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Image as ImageIcon, Upload, Eye, X, Check, MapPin, Calendar, Share2, Copy, Users, Wand2, Settings, Pencil, Facebook, Twitter, Mail, Link as LinkIcon, Music, Play, Pause } from 'lucide-react';
+import { Send, Image as ImageIcon, Upload, Eye, X, Check, MapPin, Calendar, Share2, Copy, Users, Wand2, Settings, Pencil, Music, Play, Pause } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { db } from './firebase';
 import { doc, setDoc, getDoc, collection, addDoc, onSnapshot, updateDoc } from 'firebase/firestore';
@@ -1125,54 +1125,6 @@ export default function App() {
     setEditingMessage(null);
   };
 
-  const handleNativeShare = async () => {
-    const shareUrl = window.location.href;
-    const text = `We're celebrating our ${eventData.occasion || 'Special Event'}! 🎉 Join us on our special day. Check out our invitation and RSVP here:`;
-    const title = `${eventData.brideName} & ${eventData.groomName}'s Invitation`;
-
-    let filesArray: File[] = [];
-    
-    // Find the first uploaded image from gallery or memories
-    let firstUploadedImage = null;
-    if (eventData.galleryPhotos && eventData.galleryPhotos.length > 0) {
-      firstUploadedImage = eventData.galleryPhotos[0];
-    } else if (eventData.memoriesPhotos && eventData.memoriesPhotos.length > 0) {
-      firstUploadedImage = eventData.memoriesPhotos[0];
-    }
-
-    const imageToShare = firstUploadedImage || eventData.bannerImage || eventData.bridePhoto || eventData.groomPhoto;
-    
-    if (imageToShare) {
-      try {
-        const res = await fetch(imageToShare);
-        const blob = await res.blob();
-        const file = new File([blob], 'invitation.jpg', { type: 'image/jpeg' });
-        filesArray.push(file);
-      } catch (e) {
-        console.error("Error creating file for share", e);
-      }
-    }
-
-    if (navigator.share) {
-      try {
-        if (filesArray.length > 0 && navigator.canShare && navigator.canShare({ files: filesArray })) {
-          await navigator.share({
-            title,
-            text,
-            files: filesArray
-          });
-        } else {
-          await navigator.share({
-            title,
-            text,
-          });
-        }
-      } catch (err) {
-        console.error('Error sharing:', err);
-      }
-    }
-  };
-
 
 
   if (isLoading) {
@@ -2199,14 +2151,16 @@ export default function App() {
               </div>
               <div className="p-6 bg-white space-y-4">
                 <div className="flex flex-col gap-3">
-                  <button
-                    onClick={handleNativeShare}
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`We're celebrating our ${eventData.occasion || 'Special Event'}! 🎉 Join us on our special day. Check out our invitation and RSVP here: ${window.location.href}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full bg-gray-100 text-gray-800 py-4 rounded-xl font-bold hover:bg-gray-200 transition-colors shadow-sm flex items-center justify-center gap-3"
                   >
                     <Share2 size={20} />
                     <span>Share via Device</span>
-                  </button>
-                  
+                  </a>
+
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(`We're celebrating our ${eventData.occasion || 'Special Event'}! 🎉 Join us on our special day. Check out our invitation and RSVP here: ${window.location.href}`)}`}
                     target="_blank"
@@ -2218,45 +2172,6 @@ export default function App() {
                     </svg>
                     <span>WhatsApp</span>
                   </a>
-
-                  <a
-                    href={`mailto:?subject=${encodeURIComponent(`${eventData.brideName} & ${eventData.groomName}'s Invitation`)}&body=${encodeURIComponent(`We're celebrating our ${eventData.occasion || 'Special Event'}! 🎉 Join us on our special day. Check out our invitation and RSVP here: ${window.location.href}`)}`}
-                    className="w-full bg-blue-500 text-white py-4 rounded-xl font-bold hover:bg-blue-600 transition-colors shadow-sm flex items-center justify-center gap-3"
-                  >
-                    <Mail size={20} />
-                    <span>Email</span>
-                  </a>
-
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-[#1877F2] text-white py-4 rounded-xl font-bold hover:bg-[#166fe5] transition-colors shadow-sm flex items-center justify-center gap-3"
-                  >
-                    <Facebook size={20} />
-                    <span>Facebook</span>
-                  </a>
-
-                  <a
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`Join us for our ${eventData.occasion || 'Special Event'}! 🎉`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-[#1DA1F2] text-white py-4 rounded-xl font-bold hover:bg-[#1a91da] transition-colors shadow-sm flex items-center justify-center gap-3"
-                  >
-                    <Twitter size={20} />
-                    <span>Twitter</span>
-                  </a>
-
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      alert("Link copied to clipboard!");
-                    }}
-                    className="w-full bg-gray-800 text-white py-4 rounded-xl font-bold hover:bg-gray-900 transition-colors shadow-sm flex items-center justify-center gap-3"
-                  >
-                    <LinkIcon size={20} />
-                    <span>Copy Link</span>
-                  </button>
                 </div>
               </div>
             </motion.div>
