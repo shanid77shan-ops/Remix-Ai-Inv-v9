@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AI Invitation</string>
+    <string name="title_activity_main">AI Invitation</string>
+    <string name="package_name">com.shanid.aiinvitation</string>
+    <string name="custom_url_scheme">com.shanid.aiinvitation</string>
+</resources>
