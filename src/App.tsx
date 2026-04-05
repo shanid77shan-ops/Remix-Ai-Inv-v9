@@ -867,7 +867,9 @@ export default function App() {
       return;
     }
 
-    proceedToNextStep(step);
+    if (step) {
+      proceedToNextStep(step);
+    }
   };
 
   const handleGenerateImage = async (prompt: string, step: string) => {
@@ -1047,6 +1049,7 @@ export default function App() {
   const handleShareClick = async () => {
     setIsPublishing(true);
     try {
+      const isFirstPublish = !inviteId;
       let finalId = inviteId;
 
       if (!finalId) {
@@ -1055,17 +1058,15 @@ export default function App() {
       }
 
       const inviteRef = doc(db, 'invitations', finalId);
-      const inviteSnap = await getDoc(inviteRef);
       
       const dataToSave: any = {
         ...eventData,
         creatorId: 'anonymous',
       };
-      
-      if (!inviteSnap.exists()) {
+
+      // Avoid a blocking pre-read; reads fail first when client is offline.
+      if (isFirstPublish) {
         dataToSave.createdAt = Date.now();
-      } else {
-        dataToSave.createdAt = inviteSnap.data().createdAt || Date.now();
       }
 
       await setDoc(inviteRef, dataToSave, { merge: true });
@@ -1084,6 +1085,8 @@ export default function App() {
       
       if (error?.code === 'permission-denied' || error?.message?.includes('Missing or insufficient permissions')) {
         errorMessage = "Permission denied. Your Firebase Security Rules might be blocking this action, or the data is too large/invalid.";
+      } else if (error?.code === 'unavailable' || error?.message?.toLowerCase?.().includes('client is offline')) {
+        errorMessage = "You're currently offline. Reconnect to the internet and try sharing again.";
       } else if (error?.message?.includes('payload size exceeds the limit') || error?.code === 'resource-exhausted') {
         errorMessage = "The total size of your images and music exceeds the 1MB limit. Please try using smaller files or fewer images.";
       } else if (error instanceof Error) {
@@ -1429,7 +1432,7 @@ export default function App() {
                       </label>
                     ) : (
                       <button 
-                        onClick={() => setEditingMessage({ id: msg.id, step: msg.step!, value: msg.content.toLowerCase() === 'skip' ? '' : msg.content as string })}
+                        onClick={() => setEditingMessage({ id: msg.id, step: msg.step!, value: (typeof msg.content === 'string' && msg.content.toLowerCase() === 'skip') ? '' : String(msg.content ?? '') })}
                         className="absolute -top-3 -left-3 bg-white text-gray-600 p-2 rounded-full shadow-md cursor-pointer hover:text-[#d98a8a] transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 z-10"
                       >
                         <Pencil size={14} />
