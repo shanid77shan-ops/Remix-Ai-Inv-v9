@@ -1,0 +1,122 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: invitations
+    // Document ID: Auto-generated
+    // Fields:
+    //   - creatorId: string (required, immutable) - UID of creator
+    //   - occasion: string (required)
+    //   - brideName: string (optional)
+    //   - groomName: string (optional)
+    //   - brideParents: string (optional)
+    //   - groomParents: string (optional)
+    //   - date: string (optional)
+    //   - time: string (optional)
+    //   - location: string (optional)
+    //   - schedule: string (optional)
+    //   - accommodations: string (optional)
+    //   - bannerImage: string (optional)
+    //   - bridePhoto: string (optional)
+    //   - groomPhoto: string (optional)
+    //   - galleryPhotos: list of strings (optional)
+    //   - memoriesPhotos: list of strings (optional)
+    //   - musicUrl: string (optional)
+    //   - musicName: string (optional)
+    //   - createdAt: number (required, immutable)
+    //
+    // Collection: invitations/{inviteId}/rsvps
+    // Document ID: Auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - attending: string (required, 'yes' or 'no')
+    //   - guests: number (optional)
+    //   - dietary: string (optional)
+    //   - timestamp: number (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidInvitation(data) {
+      return hasRequiredFields(['creatorId', 'occasion', 'createdAt']) &&
+             data.creatorId is string && data.creatorId.size() > 0 && data.creatorId.size() < 100 &&
+             data.occasion is string && data.occasion.size() > 0 && data.occasion.size() < 100 &&
+             data.createdAt is number &&
+             isValidOptionalString('brideName', 0, 1000) &&
+             isValidOptionalString('groomName', 0, 1000) &&
+             isValidOptionalString('brideParents', 0, 2000) &&
+             isValidOptionalString('groomParents', 0, 2000) &&
+             isValidOptionalString('date', 0, 1000) &&
+             isValidOptionalString('time', 0, 1000) &&
+             isValidOptionalString('location', 0, 2000) &&
+             isValidOptionalString('schedule', 0, 10000) &&
+             isValidOptionalString('accommodations', 0, 10000) &&
+             isValidOptionalString('bannerImage', 0, 10485760) &&
+             isValidOptionalString('bridePhoto', 0, 10485760) &&
+             isValidOptionalString('groomPhoto', 0, 10485760) &&
+             isValidOptionalString('musicUrl', 0, 10485760) &&
+             isValidOptionalString('musicName', 0, 1000) &&
+             (!('galleryPhotos' in data) || (data.galleryPhotos is list && data.galleryPhotos.size() <= 50)) &&
+             (!('memoriesPhotos' in data) || (data.memoriesPhotos is list && data.memoriesPhotos.size() <= 50));
+    }
+
+    function isValidRSVP(data) {
+      return hasRequiredFields(['name', 'attending', 'timestamp']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.attending in ['yes', 'no'] &&
+             data.timestamp is number &&
+             (!('guests' in data) || (data.guests is number && data.guests >= 0 && data.guests <= 20)) &&
+             isValidOptionalString('dietary', 0, 500);
+    }
+
+    match /invitations/{inviteId} {
+      // Anyone can read an invitation (so guests can see it)
+      allow read: if true;
+      
+      // Anyone can create an invitation
+      allow create: if isValidInvitation(request.resource.data);
+      
+      // Anyone can update an invitation
+      allow update: if isValidInvitation(request.resource.data) && 
+                    (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt);
+                    
+      allow delete: if true;
+
+      match /rsvps/{rsvpId} {
+        // Anyone can create an RSVP (guests responding)
+        allow create: if isValidRSVP(request.resource.data);
+        
+        // Anyone can read the RSVPs
+        allow read: if true;
+                    
+        // Anyone can delete RSVPs
+        allow delete: if true;
+                      
+        // RSVPs cannot be updated
+        allow update: if false;
+      }
+    }
+  }
+}

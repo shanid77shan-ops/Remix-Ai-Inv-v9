@@ -1,0 +1,7 @@
+{
+  "name": "Remix: Ai-Inv-V7",
+  "description": "remix new",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

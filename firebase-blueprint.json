@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "Invitation": {
+      "title": "Invitation",
+      "description": "A generated event invitation website.",
+      "type": "object",
+      "properties": {
+        "creatorId": {
+          "type": "string",
+          "description": "The UID of the user who created the invitation."
+        },
+        "occasion": {
+          "type": "string"
+        },
+        "brideName": {
+          "type": "string"
+        },
+        "groomName": {
+          "type": "string"
+        },
+        "brideParents": {
+          "type": "string"
+        },
+        "groomParents": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "string"
+        },
+        "accommodations": {
+          "type": "string"
+        },
+        "bannerImage": {
+          "type": "string"
+        },
+        "bridePhoto": {
+          "type": "string"
+        },
+        "groomPhoto": {
+          "type": "string"
+        },
+        "galleryPhotos": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "memoriesPhotos": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "musicUrl": {
+          "type": "string"
+        },
+        "musicName": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp of creation."
+        }
+      },
+      "required": ["creatorId", "occasion", "createdAt"]
+    },
+    "RSVP": {
+      "title": "RSVP",
+      "description": "An RSVP response from a guest.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "attending": {
+          "type": "string",
+          "enum": ["yes", "no"]
+        },
+        "guests": {
+          "type": "number"
+        },
+        "dietary": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "number"
+        }
+      },
+      "required": ["name", "attending", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/invitations/{inviteId}": {
+      "schema": { "$ref": "#/entities/Invitation" },
+      "description": "Stores the generated invitations."
+    },
+    "/invitations/{inviteId}/rsvps/{rsvpId}": {
+      "schema": { "$ref": "#/entities/RSVP" },
+      "description": "Stores RSVPs for a specific invitation."
+    }
+  }
+}
