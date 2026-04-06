@@ -1,6 +1,6 @@
 {
  "name": "@shanid77shan-ops/remix-ai-inv-v9",
- "version": "1.2.0",
+ "version": "1.2.1",
  "homepage": "https://github.com/shanid77shan-ops/Remix-Ai-Inv-v9#readme",
  "description": "A React and Vite project published to GitHub Packages",
  "type": "module",
@@ -19,6 +19,8 @@
   "dev": "vite --port=3000 --host=0.0.0.0",
   "build": "vite build",
   "preview": "vite preview",
+  "predeploy": "npm run build",
+  "deploy": "npm publish",
   "clean": "rm -rf dist",
   "lint": "tsc --noEmit"
  },
