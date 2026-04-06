@@ -1,10 +1,12 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
-}
+@layer base {
+  :root {
+    --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
+  }
 
-body {
-  background-color: #fdf8f8;
-  color: #4a4a4a;
+  body {
+    background-color: #fdf8f8;
+    color: #4a4a4a;
+  }
 }
