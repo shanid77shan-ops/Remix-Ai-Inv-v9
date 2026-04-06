@@ -1,6 +1,6 @@
 {
  "name": "@shanid77shan-ops/remix-ai-inv-v9",
- "version": "1.2.2",
+ "version": "1.2.5",
  "homepage": "https://github.com/shanid77shan-ops/Remix-Ai-Inv-v9#readme",
  "description": "A React and Vite project published to GitHub Packages",
  "type": "module",
@@ -21,6 +21,12 @@
   "preview": "vite preview",
   "predeploy": "npm run build",
   "deploy": "npm publish",
+  "predeploy:pkg": "npm run build",
+  "deploy:pkg": "npm publish",
+  "deploy:pkg:patch": "npm version patch --no-git-tag-version && npm run deploy:pkg",
+  "predeploy:web": "npm run build",
+  "deploy:web": "npx firebase deploy --only hosting",
+  "release": "npm run deploy:web && npm run deploy:pkg:patch",
   "clean": "rm -rf dist",
   "lint": "tsc --noEmit"
  },
